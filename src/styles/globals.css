@@ -1,0 +1,106 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-porcelain text-ink;
+    letter-spacing: -0.01em;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { @apply bg-line rounded-full; }
+
+  /* Focus ring */
+  :focus-visible {
+    @apply outline-none ring-2 ring-accent ring-offset-2 ring-offset-porcelain;
+  }
+}
+
+@layer components {
+  /* ---- Cursor blink ---- */
+  @keyframes blink { 50% { opacity: 0; } }
+  .cursor-blink { animation: blink 1s infinite; }
+
+  /* ---- Timer blink ---- */
+  @keyframes timer-blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .timer-pulse { animation: timer-blink 1.2s ease-in-out infinite; }
+  .timer-pulse-fast { animation: timer-blink 0.5s ease-in-out infinite; }
+
+  /* ---- Card ---- */
+  .card {
+    @apply bg-white border border-line rounded-2xl;
+  }
+  .card-hover {
+    @apply card transition-all duration-200 hover:shadow-md hover:border-faint/40 hover:-translate-y-0.5;
+  }
+
+  /* ---- Page transition ---- */
+  .page-enter { animation: fadeSlideIn 0.3s ease-out; }
+  @keyframes fadeSlideIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---- Modal ---- */
+  .modal-backdrop { animation: fadeIn 0.2s ease-out; }
+  .modal-content { animation: modalSlide 0.25s ease-out; }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes modalSlide {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  /* ---- Toast ---- */
+  .toast-enter { animation: toastSlide 0.3s ease-out; }
+  @keyframes toastSlide {
+    from { opacity: 0; transform: translateX(100%); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  /* ---- Skeleton shimmer ---- */
+  .skeleton { @apply bg-mist rounded-md animate-pulse; }
+
+  /* ---- Table rows ---- */
+  .table-row-hover { @apply transition-colors hover:bg-mist/60; }
+
+  /* ---- Section label ---- */
+  .section-label {
+    @apply text-[11px] font-semibold uppercase tracking-[1.5px] text-faint mb-3;
+  }
+
+  /* ---- Pill ---- */
+  .pill {
+    @apply inline-flex items-center gap-1.5 text-[11px] font-medium px-2.5 py-1 rounded-full;
+  }
+
+  /* Safe area for bottom nav */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Display font utility */
+  .font-display {
+    font-family: var(--font-fraunces), Georgia, serif;
+  }
+
+  /* ---- Form inputs ---- */
+  .input-base {
+    @apply w-full px-3 py-2.5 border border-line rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent placeholder:text-faint disabled:bg-mist disabled:cursor-not-allowed;
+  }
+  .select-base {
+    @apply w-full px-3 py-2.5 border border-line rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-accent disabled:bg-mist disabled:cursor-not-allowed;
+  }
+
+  /* No scrollbar utility */
+  .scrollbar-none::-webkit-scrollbar { display: none; }
+  .scrollbar-none { scrollbar-width: none; }
+}
