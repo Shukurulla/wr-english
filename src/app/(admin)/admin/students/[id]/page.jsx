@@ -4,8 +4,6 @@ import { use, useMemo } from "react";
 import Link from "next/link";
 import {
   ChevronRight,
-  Mail,
-  FileText,
   Calendar,
   Clock,
   Send,
@@ -105,10 +103,6 @@ export default function StudentProfilePage({ params }) {
       {/* Header */}
       <div className="flex items-end justify-between">
         <h1 className="text-3xl font-bold text-ink">{student.fullName}</h1>
-        <div className="flex items-center gap-3">
-          <Button variant="secondary" size="sm" icon={Mail}>Send Message</Button>
-          <Button variant="secondary" size="sm" icon={FileText}>Report</Button>
-        </div>
       </div>
 
       {/* Main layout */}
