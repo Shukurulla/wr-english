@@ -178,7 +178,7 @@ export function TaskFormModal({ open, onClose, task = null }) {
       title={isEdit ? "Edit Task" : "New Task"}
       size="xl"
     >
-      <div className="space-y-5 max-h-[70vh] overflow-y-auto">
+      <div className="space-y-5">
         <div className="grid grid-cols-2 gap-3">
           <FormField label="Type" error={errors.type}>
             <select

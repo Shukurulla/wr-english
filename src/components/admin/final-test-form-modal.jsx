@@ -99,7 +99,7 @@ export function FinalTestFormModal({ open, onClose }) {
 
   return (
     <Modal open={open} onClose={onClose} title="New Final Test" size="xl">
-      <div className="space-y-5 max-h-[70vh] overflow-y-auto">
+      <div className="space-y-5">
         <div className="grid grid-cols-2 gap-3">
           <div>
             <label className="block text-[11px] font-semibold uppercase tracking-[1.2px] text-faint mb-1.5">

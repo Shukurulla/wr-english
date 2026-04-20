@@ -155,7 +155,7 @@ function AssignModal({ open, onClose }) {
 
   return (
     <Modal open={open} onClose={onClose} title="Assign tasks to group" size="lg">
-      <div className="space-y-4 max-h-[70vh] overflow-y-auto">
+      <div className="space-y-4">
         <div>
           <p className="section-label">Group</p>
           <select

@@ -18,8 +18,6 @@ import {
   LogOut,
   Award,
   ClipboardList,
-  Settings,
-  ShieldAlert,
   MoreHorizontal,
   X,
 } from "lucide-react";
@@ -42,8 +40,6 @@ const adminLinks = [
   { href: "/admin/tests", label: "Tests", icon: FileText },
   { href: "/admin/final-tests", label: "Final Tests", icon: ClipboardList },
   { href: "/admin/complaints", label: "Complaints", icon: MessageSquare, hasBadge: true },
-  { href: "/admin/audit-logs", label: "Audit Log", icon: ShieldAlert },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
 // Bottom tabs: 3 primary links + "More" button
