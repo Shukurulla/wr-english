@@ -4,12 +4,12 @@ const nextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "http://localhost:8847/api/:path*",
+        destination: "http://wr-server.kerek.uz/api/:path*",
         // destination: "https://wr-server.kerek.uz/api/:path*"
       },
       {
         source: "/uploads/:path*",
-        destination: "http://localhost:8847/uploads/:path*",
+        destination: "https://wr-server.kerek.uz/uploads/:path*",
       },
     ];
   },
