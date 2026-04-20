@@ -4,8 +4,7 @@ const nextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "http://wr-server.kerek.uz/api/:path*",
-        // destination: "https://wr-server.kerek.uz/api/:path*"
+        destination: "https://wr-server.kerek.uz/api/:path*",
       },
       {
         source: "/uploads/:path*",
