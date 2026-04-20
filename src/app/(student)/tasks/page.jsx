@@ -1,61 +1,27 @@
 "use client";
 
 import { useState } from "react";
-import { BookOpen, PenLine, ChevronRight, Clock } from "lucide-react";
+import { BookOpen, PenLine, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { useMyAssignments } from "@/lib/api-hooks";
 import Link from "next/link";
 
+const DONE_STATUSES = new Set(["auto_graded", "ai_graded", "manual_review", "finalized"]);
+
 const filters = [
   { key: "all", label: "All" },
-  { key: "active", label: "Active" },
-  { key: "upcoming", label: "Upcoming" },
+  { key: "available", label: "Available" },
+  { key: "in_progress", label: "In progress" },
   { key: "completed", label: "Completed" },
-  { key: "missed", label: "Missed" },
 ];
 
-function getAssignmentStatus(assignment) {
-  const now = new Date();
-  const opensAt = new Date(assignment.opensAt);
-  const dueAt = new Date(assignment.dueAt);
-  const closesAt = assignment.closesAt ? new Date(assignment.closesAt) : dueAt;
-
-  if (assignment.submissionStatus && assignment.submissionStatus !== "in_progress") {
-    return "completed";
-  }
-  if (assignment.status === "completed" || assignment.status === "graded") {
-    return "completed";
-  }
-
-  if (opensAt > now) return "upcoming";
-  if (opensAt <= now && closesAt >= now) return "active";
-  if (closesAt < now) return "missed";
-  return "upcoming";
-}
-
-function formatDueDate(dateStr) {
-  const d = new Date(dateStr);
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return `${months[d.getMonth()]} ${d.getDate()}`;
-}
-
-function StatusPill({ status }) {
-  if (status === "completed") {
-    return (
-      <span className="text-xs font-semibold text-accent bg-[#ECFDF5] px-2.5 py-1 rounded-full">
-        Done
-      </span>
-    );
-  }
-  if (status === "missed") {
-    return (
-      <span className="text-xs font-semibold text-[#B91C1C] bg-[#FEF2F2] px-2.5 py-1 rounded-full">
-        Missed
-      </span>
-    );
-  }
-  return null;
+function getTaskStatus(a) {
+  const s = a.submissionStatus;
+  if (!s) return "available";
+  if (s === "in_progress") return "in_progress";
+  if (DONE_STATUSES.has(s)) return "completed";
+  return "available";
 }
 
 function TasksSkeleton() {
@@ -95,17 +61,14 @@ export default function TasksPage() {
 
   const tests = (assignments || []).map((assignment) => {
     const task = assignment.taskId;
-    const status = getAssignmentStatus(assignment);
     return {
       id: assignment._id,
       name: task?.title || "Task",
       type: task?.type || "reading",
-      status,
-      dueDate: formatDueDate(assignment.dueAt),
-      score: null,
+      semester: task?.semester,
+      status: getTaskStatus(assignment),
+      submissionId: assignment.submissionId,
       maxScore: task?.maxScore || 0,
-      passed: null,
-      assignment,
     };
   });
 
@@ -116,10 +79,9 @@ export default function TasksPage() {
 
   const counts = {
     all: tests.length,
-    active: tests.filter((t) => t.status === "active").length,
-    upcoming: tests.filter((t) => t.status === "upcoming").length,
+    available: tests.filter((t) => t.status === "available").length,
+    in_progress: tests.filter((t) => t.status === "in_progress").length,
     completed: tests.filter((t) => t.status === "completed").length,
-    missed: tests.filter((t) => t.status === "missed").length,
   };
 
   return (
@@ -157,62 +119,63 @@ export default function TasksPage() {
       </div>
 
       <div className="space-y-2.5">
-        {filtered.map((test) => (
-          <Link
-            key={test.id}
-            href={
-              test.status === "completed"
-                ? `/results`
-                : `/tasks/${test.id}`
-            }
-            className="flex items-center gap-3 bg-white border border-line rounded-2xl p-4 hover:bg-mist/50 transition-colors"
-          >
-            <div
-              className={cn(
-                "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
-                test.status === "active"
-                  ? test.type === "reading"
+        {filtered.map((test) => {
+          const targetHref =
+            test.status === "completed" && test.submissionId
+              ? `/results/${test.submissionId}`
+              : `/tasks/${test.id}`;
+          return (
+            <Link
+              key={test.id}
+              href={targetHref}
+              className="flex items-center gap-3 bg-white border border-line rounded-2xl p-4 hover:bg-mist/50 transition-colors"
+            >
+              <div
+                className={cn(
+                  "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
+                  test.status === "completed"
+                    ? "bg-[#ECFDF5] text-accent"
+                    : test.type === "reading"
                     ? "bg-[#EFF6FF] text-[#1D4ED8]"
                     : "bg-[#ECFDF5] text-accent"
-                  : test.status === "completed"
-                  ? "bg-[#ECFDF5] text-accent"
-                  : test.status === "missed"
-                  ? "bg-[#FEF2F2] text-[#B91C1C]"
-                  : "bg-mist text-muted"
-              )}
-            >
-              {test.type === "reading" ? (
-                <BookOpen className="w-5 h-5" />
-              ) : (
-                <PenLine className="w-5 h-5" />
-              )}
-            </div>
+                )}
+              >
+                {test.type === "reading" ? (
+                  <BookOpen className="w-5 h-5" />
+                ) : (
+                  <PenLine className="w-5 h-5" />
+                )}
+              </div>
 
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-ink truncate">{test.name}</p>
-              <p className="text-xs text-muted mt-0.5 flex items-center gap-1.5 capitalize">
-                {test.type}
-                <span className="text-line">|</span>
-                <Clock className="w-3 h-3" />
-                {test.dueDate}
-              </p>
-            </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-ink truncate">{test.name}</p>
+                <p className="text-xs text-muted mt-0.5 capitalize">
+                  {test.type}
+                  {test.semester ? ` · Semester ${test.semester}` : ""}
+                </p>
+              </div>
 
-            {test.status === "active" && (
-              <Button size="sm" variant="accent">
-                Start
-              </Button>
-            )}
-            <StatusPill status={test.status} />
-            {test.status === "upcoming" && (
+              {test.status === "available" && (
+                <Button size="sm" variant="accent">Start</Button>
+              )}
+              {test.status === "in_progress" && (
+                <span className="text-xs font-semibold text-[#B45309] bg-[#FEF3C7] px-2.5 py-1 rounded-full">
+                  In progress
+                </span>
+              )}
+              {test.status === "completed" && (
+                <span className="text-xs font-semibold text-accent bg-[#ECFDF5] px-2.5 py-1 rounded-full">
+                  Done
+                </span>
+              )}
               <ChevronRight className="w-5 h-5 text-faint shrink-0" />
-            )}
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
 
         {filtered.length === 0 && (
           <div className="text-center py-12 text-muted">
-            No tests found for this filter.
+            No tests in this filter.
           </div>
         )}
       </div>

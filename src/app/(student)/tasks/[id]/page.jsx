@@ -27,17 +27,18 @@ export default function TaskDetailPage() {
   const [agreed, setAgreed] = useState(false);
   const [conflictModalOpen, setConflictModalOpen] = useState(false);
   const [existingSubId, setExistingSubId] = useState("");
+  const [existingStatus, setExistingStatus] = useState("in_progress");
 
-  const { data: assignment, isLoading } = useQuery({
-    queryKey: ["assignment", id],
-    queryFn: async () => {
-      const assignments = await api.get("/assignments/my");
-      return assignments.data.find((a) => a._id === id);
-    },
+  // The list endpoint returns virtual assignments whose _id is the taskId.
+  // Fetch the task directly for full detail.
+  const { data: task, isLoading } = useQuery({
+    queryKey: ["task", id],
+    queryFn: () => api.get(`/tasks/${id}`).then((r) => r.data),
+    enabled: !!id,
   });
 
   const startMutation = useMutation({
-    mutationFn: () => api.post("/submissions/start", { assignmentId: id }),
+    mutationFn: () => api.post("/submissions/start", { taskId: id }),
     onSuccess: (res) => {
       const sub = res?.data?.submission || res?.submission;
       const subId = sub?._id || "";
@@ -50,10 +51,11 @@ export default function TaskDetailPage() {
         const status = err?.error?.details?.submission?.status;
         if (subId) {
           if (status && status !== "in_progress") {
-             router.push(`/results/${subId}`);
-             return;
+            router.push(`/results/${subId}`);
+            return;
           }
           setExistingSubId(subId);
+          setExistingStatus(status || "in_progress");
           setConflictModalOpen(true);
         } else {
           router.push(`/tasks/${id}/work`);
@@ -79,7 +81,7 @@ export default function TaskDetailPage() {
   });
 
   if (isLoading) return <PageLoader />;
-  if (!assignment) {
+  if (!task) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-8">
         <p className="text-[#B91C1C]">Task not found</p>
@@ -87,39 +89,18 @@ export default function TaskDetailPage() {
     );
   }
 
-  const task = assignment.taskId;
-  const isWriting = task?.type === "writing";
-  const now = new Date();
-  const isNotOpen = now < new Date(assignment.opensAt);
-  const isClosed = assignment.closesAt ? now > new Date(assignment.closesAt) : false;
-  const isDuePassed = assignment.dueAt ? now > new Date(assignment.dueAt) : false;
-  const isExpired = isClosed || isDuePassed;
+  const isWriting = task.type === "writing";
   const timeMinutes = isWriting
-    ? Math.floor((task?.writing?.timeLimit || 1200) / 60)
+    ? Math.floor((task.writing?.timeLimit || 1200) / 60)
     : 15;
-  const questionCount = isWriting ? 1 : task?.reading?.questions?.length || 13;
-  const maxScore = task?.maxScore ?? (isWriting ? 0.5 : 0.5);
-
-  const semester = assignment.semester || task?.semester || 1;
-  const week = assignment.week || task?.week || "";
+  const questionCount = isWriting ? 1 : task.reading?.questions?.length || 0;
+  const maxScore = task.maxScore ?? 0;
 
   const rules = [
-    {
-      icon: Clock,
-      text: `Timer starts — ${timeMinutes} minutes, cannot be paused`,
-    },
-    {
-      icon: Maximize,
-      text: "Fullscreen mode — leaving ends the test automatically",
-    },
-    {
-      icon: RefreshCw,
-      text: "Don't close the page — answers are auto-saved",
-    },
-    {
-      icon: Flag,
-      text: "Complaint available — within 24 hours of results",
-    },
+    { icon: Clock, text: `Timer starts — ${timeMinutes} minutes, cannot be paused` },
+    { icon: Maximize, text: "Fullscreen mode — leaving ends the test automatically" },
+    { icon: RefreshCw, text: "Don't close the page — answers are auto-saved" },
+    { icon: Flag, text: "Complaint available — within 24 hours of results" },
   ];
 
   return (
@@ -149,13 +130,12 @@ export default function TaskDetailPage() {
           </Badge>
 
           <h2 className="text-2xl font-display font-bold tracking-tight leading-tight">
-            {task?.title || "Test"}
+            {task.title || "Test"}
           </h2>
 
-          {semester && (
+          {task.semester && (
             <p className="text-white/50 text-sm">
-              Semester {semester}
-              {week ? ` · Week ${week}` : ""}
+              Semester {task.semester}
             </p>
           )}
 
@@ -164,10 +144,12 @@ export default function TaskDetailPage() {
               <Clock className="w-4 h-4 text-white/40" />
               <span className="text-sm text-white/70">{timeMinutes} min</span>
             </div>
-            <div className="flex items-center gap-2">
-              <HelpCircle className="w-4 h-4 text-white/40" />
-              <span className="text-sm text-white/70">{questionCount} questions</span>
-            </div>
+            {!isWriting && (
+              <div className="flex items-center gap-2">
+                <HelpCircle className="w-4 h-4 text-white/40" />
+                <span className="text-sm text-white/70">{questionCount} questions</span>
+              </div>
+            )}
             <div className="flex items-center gap-2">
               <Trophy className="w-4 h-4 text-white/40" />
               <span className="text-sm text-white/70">{maxScore} pts max</span>
@@ -196,83 +178,32 @@ export default function TaskDetailPage() {
         </div>
       </div>
 
-      {isExpired ? (
-        <div className="bg-[#FEF2F2] border-2 border-[#B91C1C]/30 rounded-2xl p-6 text-center space-y-3">
-          <div className="w-14 h-14 rounded-2xl bg-[#FECACA] flex items-center justify-center mx-auto">
-            <AlertTriangle className="w-7 h-7 text-[#B91C1C]" />
-          </div>
-          <h3 className="text-lg font-bold text-[#B91C1C]">Deadline has passed</h3>
-          <p className="text-sm text-muted leading-relaxed max-w-md mx-auto">
-            The submission deadline for this test has expired. You can no longer start or submit this test.
-            {assignment.dueAt && (
-              <span className="block mt-2 font-semibold text-ink">
-                Deadline was: {new Date(assignment.dueAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
-              </span>
-            )}
-          </p>
-          <Button variant="secondary" size="md" onClick={() => router.push("/tasks")} className="mt-2">
-            Back to Tests
-          </Button>
-        </div>
-      ) : isNotOpen ? (
-        <div className="bg-[#EFF6FF] border-2 border-[#1D4ED8]/20 rounded-2xl p-6 text-center space-y-3">
-          <div className="w-14 h-14 rounded-2xl bg-[#DBEAFE] flex items-center justify-center mx-auto">
-            <Clock className="w-7 h-7 text-[#1D4ED8]" />
-          </div>
-          <h3 className="text-lg font-bold text-[#1D4ED8]">Not yet available</h3>
-          <p className="text-sm text-muted leading-relaxed max-w-md mx-auto">
-            This test will open on{" "}
-            <span className="font-semibold text-ink">
-              {new Date(assignment.opensAt).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit" })}
-            </span>
-          </p>
-          <Button variant="secondary" size="md" onClick={() => router.push("/tasks")} className="mt-2">
-            Back to Tests
-          </Button>
-        </div>
-      ) : assignment.submissionStatus && assignment.submissionStatus !== "in_progress" ? (
-        <div className="bg-[#ECFDF5] border-2 border-[#10B981]/20 rounded-2xl p-6 text-center space-y-3">
-          <div className="w-14 h-14 rounded-2xl bg-[#D1FAE5] flex items-center justify-center mx-auto">
-            <Trophy className="w-7 h-7 text-[#059669]" />
-          </div>
-          <h3 className="text-lg font-bold text-[#059669]">Already Completed</h3>
-          <p className="text-sm text-muted leading-relaxed max-w-md mx-auto">
-            You have already successfully completed this test.
-          </p>
-          <Button variant="secondary" size="md" onClick={() => router.push("/results")} className="mt-2 text-[#059669]">
-            View Results
-          </Button>
-        </div>
-      ) : (
-        <>
-          <label className="flex items-start gap-3 cursor-pointer select-none bg-white border border-line rounded-xl p-4">
-            <input
-              type="checkbox"
-              checked={agreed}
-              onChange={(e) => setAgreed(e.target.checked)}
-              className="w-4.5 h-4.5 rounded border-line text-accent focus:ring-accent focus:ring-offset-0 mt-0.5"
-            />
-            <span className="text-sm text-ink leading-relaxed">
-              I understand and agree to the rules above
-            </span>
-          </label>
+      <label className="flex items-start gap-3 cursor-pointer select-none bg-white border border-line rounded-xl p-4">
+        <input
+          type="checkbox"
+          checked={agreed}
+          onChange={(e) => setAgreed(e.target.checked)}
+          className="w-4.5 h-4.5 rounded border-line text-accent focus:ring-accent focus:ring-offset-0 mt-0.5"
+        />
+        <span className="text-sm text-ink leading-relaxed">
+          I understand and agree to the rules above
+        </span>
+      </label>
 
-          <div className="fixed bottom-[88px] md:bottom-0 left-0 right-0 bg-porcelain/80 backdrop-blur-lg border-t border-line p-4 z-40 sm:static sm:bg-transparent sm:backdrop-blur-none sm:border-0 sm:p-0">
-            <div className="max-w-2xl mx-auto">
-              <Button
-                onClick={() => startMutation.mutate()}
-                loading={startMutation.isPending}
-                disabled={!agreed}
-                size="lg"
-                className="w-full"
-                icon={Play}
-              >
-                Start Test
-              </Button>
-            </div>
-          </div>
-        </>
-      )}
+      <div className="fixed bottom-[88px] md:bottom-0 left-0 right-0 bg-porcelain/80 backdrop-blur-lg border-t border-line p-4 z-40 sm:static sm:bg-transparent sm:backdrop-blur-none sm:border-0 sm:p-0">
+        <div className="max-w-2xl mx-auto">
+          <Button
+            onClick={() => startMutation.mutate()}
+            loading={startMutation.isPending}
+            disabled={!agreed}
+            size="lg"
+            className="w-full"
+            icon={Play}
+          >
+            Start Test
+          </Button>
+        </div>
+      </div>
 
       <Modal open={conflictModalOpen} onClose={() => setConflictModalOpen(false)} title="Test Already Started">
         <div className="space-y-4">

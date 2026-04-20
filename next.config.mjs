@@ -4,14 +4,15 @@ const nextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "https://wr-server.kerek.uz/api/:path*"
+        destination: "http://localhost:8847/api/:path*",
+        // destination: "https://wr-server.kerek.uz/api/:path*"
       },
       {
         source: "/uploads/:path*",
-        destination: "https://wr-server.kerek.uz/uploads/:path*"
-      }
+        destination: "http://localhost:8847/uploads/:path*",
+      },
     ];
-  }
+  },
 };
 
 export default nextConfig;

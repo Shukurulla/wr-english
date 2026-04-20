@@ -2,7 +2,7 @@
 
 import { useAuthStore } from "@/stores/auth";
 import { useMyGrades, useMyAssignments } from "@/lib/api-hooks";
-import { Bell, BookOpen, PenLine, ChevronRight, Clock } from "lucide-react";
+import { Bell, BookOpen, PenLine, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
@@ -16,21 +16,6 @@ function HBar({ value, max, color = "bg-accent" }) {
       />
     </div>
   );
-}
-
-function formatDueIn(dueAt) {
-  const now = new Date();
-  const due = new Date(dueAt);
-  const diffMs = due - now;
-  if (diffMs <= 0) return "Overdue";
-  const diffMin = Math.floor(diffMs / 60000);
-  if (diffMin < 60) return `${diffMin}m`;
-  const diffHours = Math.floor(diffMin / 60);
-  if (diffHours < 24) return `${diffHours}h ${diffMin % 60}m`;
-  const diffDays = Math.floor(diffHours / 24);
-  if (diffDays === 1) return "Tomorrow";
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return `${months[due.getMonth()]} ${due.getDate()}`;
 }
 
 function DashboardSkeleton() {
@@ -50,6 +35,8 @@ function DashboardSkeleton() {
   );
 }
 
+const DONE_STATUSES = new Set(["auto_graded", "ai_graded", "manual_review", "finalized"]);
+
 export default function DashboardPage() {
   const { user } = useAuthStore();
   const firstName = user?.name?.split(" ")[0] || user?.fullName?.split(" ")[0] || "Student";
@@ -65,9 +52,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-ink">
             Hello, {firstName}
-            <span className="ml-1" role="img" aria-label="wave">
-              👋
-            </span>
+            <span className="ml-1" role="img" aria-label="wave">👋</span>
           </h1>
           <Link
             href="/notifications"
@@ -88,18 +73,10 @@ export default function DashboardPage() {
   const finalTestScore = grades?.finalTestScore ?? 0;
   const componentMax = maxScore / 2;
 
-  const now = new Date();
-  const upcomingTests = (assignments || [])
-    .filter((a) => new Date(a.dueAt) > now && new Date(a.opensAt) <= now)
-    .sort((a, b) => new Date(a.dueAt) - new Date(b.dueAt))
+  // All tasks are always open. Show the ones the student hasn't finished yet.
+  const openTasks = (assignments || [])
+    .filter((a) => !a.submissionStatus || !DONE_STATUSES.has(a.submissionStatus))
     .slice(0, 5);
-
-  const futureTests = (assignments || [])
-    .filter((a) => new Date(a.opensAt) > now)
-    .sort((a, b) => new Date(a.opensAt) - new Date(b.opensAt))
-    .slice(0, 3);
-
-  const allUpcoming = [...upcomingTests, ...futureTests].slice(0, 5);
 
   const gradeItems = grades?.items || [];
   const recentGrade = gradeItems.length > 0 ? gradeItems[gradeItems.length - 1] : null;
@@ -121,9 +98,7 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold text-ink">
           Hello, {firstName}
-          <span className="ml-1" role="img" aria-label="wave">
-            👋
-          </span>
+          <span className="ml-1" role="img" aria-label="wave">👋</span>
         </h1>
         <Link
           href="/notifications"
@@ -193,21 +168,24 @@ export default function DashboardPage() {
       </div>
 
       <section>
-        <h2 className="text-lg font-bold text-ink mb-3">Upcoming tests</h2>
+        <div className="flex items-baseline justify-between mb-3">
+          <h2 className="text-lg font-bold text-ink">Tests to take</h2>
+          <Link href="/tasks" className="text-xs font-semibold text-accent hover:underline">
+            See all
+          </Link>
+        </div>
         <div className="space-y-2.5">
-          {allUpcoming.length === 0 && (
+          {openTasks.length === 0 && (
             <div className="text-center py-8 text-muted text-sm">
-              No upcoming tests at the moment.
+              No tests left. Great job!
             </div>
           )}
-          {allUpcoming.map((assignment) => {
-            const task = assignment.taskId;
-            const isActive = new Date(assignment.opensAt) <= now && new Date(assignment.dueAt) > now;
+          {openTasks.map((a) => {
+            const task = a.taskId;
             const taskType = task?.type || "reading";
-
             return (
               <div
-                key={assignment._id}
+                key={a._id}
                 className="flex items-center gap-3 bg-white border border-line rounded-2xl p-4"
               >
                 <div
@@ -227,19 +205,14 @@ export default function DashboardPage() {
                   <p className="text-sm font-semibold text-ink truncate">
                     {task?.title || "Task"}
                   </p>
-                  <p className="text-xs text-muted flex items-center gap-1 mt-0.5">
-                    <Clock className="w-3 h-3" /> {formatDueIn(assignment.dueAt)}
+                  <p className="text-xs text-muted mt-0.5 capitalize">
+                    {taskType}
+                    {task?.semester ? ` · Semester ${task.semester}` : ""}
                   </p>
                 </div>
-                {isActive ? (
-                  <Link href={`/tasks/${assignment._id}`}>
-                    <Button size="sm" variant="accent">
-                      Start
-                    </Button>
-                  </Link>
-                ) : (
-                  <ChevronRight className="w-5 h-5 text-faint shrink-0" />
-                )}
+                <Link href={`/tasks/${a._id}`}>
+                  <Button size="sm" variant="accent">Start</Button>
+                </Link>
               </div>
             );
           })}
@@ -263,6 +236,7 @@ export default function DashboardPage() {
             <span className="font-display text-2xl font-bold text-accent">
               {Number(recentResultScore).toFixed(1)}
             </span>
+            <ChevronRight className="w-5 h-5 text-faint" />
           </Link>
         </section>
       )}
