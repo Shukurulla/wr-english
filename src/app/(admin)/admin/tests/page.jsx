@@ -138,9 +138,9 @@ export default function AdminTestsPage() {
               <Link
                 key={t._id}
                 href={`/admin/tests/${t._id}`}
-                className="grid grid-cols-[2.5fr_1fr_1fr_1fr_50px] gap-3 px-5 py-3.5 items-center border-b border-line transition-colors hover:bg-mist/60"
+                className="flex lg:grid lg:grid-cols-[2.5fr_1fr_1fr_1fr_50px] gap-3 px-4 lg:px-5 py-3.5 items-center border-b border-line transition-colors hover:bg-mist/60"
               >
-                <div className="flex items-center gap-3 min-w-0">
+                <div className="flex items-center gap-3 min-w-0 flex-1 lg:flex-none">
                   <div
                     className={cn(
                       "w-9 h-9 rounded-lg flex items-center justify-center shrink-0",
@@ -155,17 +155,20 @@ export default function AdminTestsPage() {
                       <PenLine className="w-4 h-4" />
                     )}
                   </div>
-                  <div className="min-w-0">
+                  <div className="min-w-0 flex-1">
                     <p className="text-sm font-semibold text-ink truncate">{t.title}</p>
+                    <p className="text-xs text-muted truncate mt-0.5 lg:hidden">
+                      {isReading ? "Reading" : "Writing"} · Sem {t.semester} · {t.maxScore} pts
+                    </p>
                     {t.topic && (
-                      <p className="text-xs text-muted truncate mt-0.5">{t.topic}</p>
+                      <p className="text-xs text-muted truncate mt-0.5 hidden lg:block">{t.topic}</p>
                     )}
                   </div>
                 </div>
 
                 <span
                   className={cn(
-                    "inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full w-fit",
+                    "inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full w-fit hidden lg:inline-flex",
                     isReading
                       ? "bg-[#EFF6FF] text-[#1D4ED8]"
                       : "bg-[#ECFDF5] text-accent"
@@ -174,11 +177,11 @@ export default function AdminTestsPage() {
                   {isReading ? "Reading" : "Writing"}
                 </span>
 
-                <span className="text-sm text-muted">Semester {t.semester}</span>
+                <span className="text-sm text-muted hidden lg:inline">Semester {t.semester}</span>
 
-                <span className="font-display text-lg font-medium">{t.maxScore}</span>
+                <span className="font-display text-lg font-medium hidden lg:inline">{t.maxScore}</span>
 
-                <div className="flex justify-end">
+                <div className="flex justify-end shrink-0">
                   <ChevronRight className="w-4 h-4 text-faint" />
                 </div>
               </Link>

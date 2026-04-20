@@ -258,45 +258,47 @@ export default function GroupDetailPage({ params }) {
             </Button>
           </div>
         ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-line">
-                <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted px-6 py-3">Student</th>
-                <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted px-4 py-3">Reading</th>
-                <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted px-4 py-3">Writing</th>
-                <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted px-4 py-3">Total</th>
-                <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted px-4 py-3">Status</th>
-                <th className="px-6 py-3"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {studentsList.map((s) => (
-                <tr key={s._id} className={cn("border-b border-line last:border-0 hover:bg-mist/50 transition-colors", !s.passed && "bg-[#FEF2F2] hover:bg-[#FEE2E2]")}>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold", !s.passed ? "bg-[#FECACA] text-[#B91C1C]" : "bg-mist text-muted")}>
-                        {s.avatar}
-                      </div>
-                      <Link href={`/admin/students/${s._id}`} className="text-[13px] font-semibold text-[#1D4ED8] hover:underline">{s.name}</Link>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-[13px] font-medium text-ink">{s.reading.toFixed(1)}</td>
-                  <td className="px-4 py-4 text-[13px] font-medium text-ink">{s.writing.toFixed(1)}</td>
-                  <td className="px-4 py-4">
-                    <span className={cn("text-[14px] font-display font-bold", !s.passed ? "text-[#B91C1C]" : "text-ink")}>{s.total.toFixed(1)}</span>
-                  </td>
-                  <td className="px-4 py-4">
-                    <span className={cn("text-[11px] font-semibold uppercase px-2 py-0.5 rounded-full", s.passed ? "bg-accent-soft text-accent" : "bg-[#FEF2F2] text-[#B91C1C]")}>
-                      {s.passed ? "Passed" : "Failed"}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <Link href={`/admin/students/${s._id}`}><ChevronRight className="w-4 h-4 text-faint hover:text-ink transition-colors inline-block" /></Link>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[640px]">
+              <thead>
+                <tr className="border-b border-line">
+                  <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted px-4 md:px-6 py-3">Student</th>
+                  <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted px-3 md:px-4 py-3">Reading</th>
+                  <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted px-3 md:px-4 py-3">Writing</th>
+                  <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted px-3 md:px-4 py-3">Total</th>
+                  <th className="text-left text-[11px] font-semibold uppercase tracking-wider text-muted px-3 md:px-4 py-3">Status</th>
+                  <th className="px-4 md:px-6 py-3"></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {studentsList.map((s) => (
+                  <tr key={s._id} className={cn("border-b border-line last:border-0 hover:bg-mist/50 transition-colors", !s.passed && "bg-[#FEF2F2] hover:bg-[#FEE2E2]")}>
+                    <td className="px-4 md:px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0", !s.passed ? "bg-[#FECACA] text-[#B91C1C]" : "bg-mist text-muted")}>
+                          {s.avatar}
+                        </div>
+                        <Link href={`/admin/students/${s._id}`} className="text-[13px] font-semibold text-[#1D4ED8] hover:underline whitespace-nowrap">{s.name}</Link>
+                      </div>
+                    </td>
+                    <td className="px-3 md:px-4 py-4 text-[13px] font-medium text-ink whitespace-nowrap">{s.reading.toFixed(1)}</td>
+                    <td className="px-3 md:px-4 py-4 text-[13px] font-medium text-ink whitespace-nowrap">{s.writing.toFixed(1)}</td>
+                    <td className="px-3 md:px-4 py-4 whitespace-nowrap">
+                      <span className={cn("text-[14px] font-display font-bold", !s.passed ? "text-[#B91C1C]" : "text-ink")}>{s.total.toFixed(1)}</span>
+                    </td>
+                    <td className="px-3 md:px-4 py-4 whitespace-nowrap">
+                      <span className={cn("text-[11px] font-semibold uppercase px-2 py-0.5 rounded-full", s.passed ? "bg-accent-soft text-accent" : "bg-[#FEF2F2] text-[#B91C1C]")}>
+                        {s.passed ? "Passed" : "Failed"}
+                      </span>
+                    </td>
+                    <td className="px-4 md:px-6 py-4 text-right">
+                      <Link href={`/admin/students/${s._id}`}><ChevronRight className="w-4 h-4 text-faint hover:text-ink transition-colors inline-block" /></Link>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
 

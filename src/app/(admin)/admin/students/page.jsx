@@ -173,21 +173,23 @@ export default function StudentsPage() {
                 <Link
                   key={s._id}
                   href={`/admin/students/${s._id}`}
-                  className="grid grid-cols-[2.5fr_1fr_1fr_50px] gap-3 px-5 py-3.5 items-center border-b border-line transition-colors hover:bg-mist/60"
+                  className="flex lg:grid lg:grid-cols-[2.5fr_1fr_1fr_50px] gap-3 px-4 lg:px-5 py-3.5 items-center border-b border-line transition-colors hover:bg-mist/60"
                 >
-                  {/* Student */}
-                  <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex items-center gap-3 min-w-0 flex-1 lg:flex-none">
                     <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold text-white shrink-0 bg-accent">
                       {initials}
                     </div>
-                    <span className="text-sm font-semibold text-[#1D4ED8] truncate">{s.fullName}</span>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-[#1D4ED8] truncate">{s.fullName}</p>
+                      <p className="text-xs text-muted truncate lg:hidden">
+                        {groupName !== "—" && <span>{groupName} · </span>}
+                        {s.email}
+                      </p>
+                    </div>
                   </div>
-                  {/* Group */}
-                  <span className="text-sm text-muted">{groupName}</span>
-                  {/* Email */}
-                  <span className="text-sm text-muted truncate">{s.email}</span>
-                  {/* Arrow */}
-                  <div className="flex justify-end">
+                  <span className="text-sm text-muted hidden lg:inline truncate">{groupName}</span>
+                  <span className="text-sm text-muted hidden lg:inline truncate">{s.email}</span>
+                  <div className="flex justify-end shrink-0">
                     <ChevronRight className="w-4 h-4 text-faint" />
                   </div>
                 </Link>

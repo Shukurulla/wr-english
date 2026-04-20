@@ -20,6 +20,8 @@ import {
   ClipboardList,
   Settings,
   ShieldAlert,
+  MoreHorizontal,
+  X,
 } from "lucide-react";
 
 const studentLinks = [
@@ -44,17 +46,16 @@ const adminLinks = [
   { href: "/admin/settings", label: "Settings", icon: Settings },
 ];
 
+// Bottom tabs: 3 primary links + "More" button
 const studentBottomTabs = [
   { href: "/dashboard", label: "Home", icon: Home },
   { href: "/tasks", label: "Tests", icon: FileText },
   { href: "/grades", label: "Grades", icon: Award },
-  { href: "/profile", label: "Profile", icon: User },
 ];
 
 const adminBottomTabs = [
   { href: "/admin/dashboard", label: "Home", icon: LayoutDashboard },
   { href: "/admin/groups", label: "Groups", icon: Users },
-  { href: "/admin/complaints", label: "Complaints", icon: MessageSquare },
   { href: "/admin/students", label: "Students", icon: GraduationCap },
 ];
 
@@ -83,6 +84,82 @@ function LogoutConfirmModal({ open, onClose, onConfirm }) {
             className="flex-1 px-4 py-2.5 rounded-xl bg-[#B91C1C] text-white text-sm font-semibold hover:bg-red-700 transition-colors"
           >
             Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MoreSheet({ open, onClose, links, openComplaintCount, user, role, onLogout }) {
+  const pathname = usePathname();
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[150] md:hidden flex items-end" role="dialog" aria-modal="true">
+      <div className="absolute inset-0 bg-ink/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-white rounded-t-3xl w-full max-h-[85vh] overflow-y-auto safe-area-bottom">
+        <div className="sticky top-0 bg-white z-10 flex items-center justify-between px-5 py-4 border-b border-line">
+          <h3 className="text-base font-bold text-ink">Menu</h3>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="w-9 h-9 rounded-lg hover:bg-mist flex items-center justify-center transition-colors"
+          >
+            <X className="w-5 h-5 text-ink" />
+          </button>
+        </div>
+
+        <div className="px-3 py-3 space-y-0.5">
+          {links.map((item) => {
+            const active = pathname === item.href || pathname.startsWith(item.href + "/");
+            const Icon = item.icon;
+            const badgeCount = item.hasBadge ? openComplaintCount : 0;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                onClick={onClose}
+                className={cn(
+                  "flex items-center justify-between px-3 py-3.5 rounded-xl text-[14px] font-medium transition-colors",
+                  active
+                    ? "bg-ink text-porcelain"
+                    : "text-ink hover:bg-mist"
+                )}
+              >
+                <span className="flex items-center gap-3">
+                  <Icon className="w-5 h-5" />
+                  {item.label}
+                </span>
+                {badgeCount > 0 && (
+                  <span className={cn(
+                    "min-w-[20px] h-5 px-1.5 rounded-full text-[11px] font-semibold flex items-center justify-center",
+                    active ? "bg-porcelain/20 text-porcelain" : "bg-red-500 text-white"
+                  )}>
+                    {badgeCount}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
+        </div>
+
+        <div className="px-3 pb-4 pt-2 border-t border-line">
+          <div className="flex items-center gap-3 px-3 py-2.5 mb-2">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-zinc-300 to-zinc-400 flex items-center justify-center text-porcelain text-sm font-semibold shrink-0">
+              {user?.fullName?.charAt(0)?.toUpperCase() || "U"}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold truncate">{user?.fullName}</p>
+              <p className="text-xs text-muted">{role === "admin" ? "Administrator" : "Student"}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => { onClose(); onLogout(); }}
+            className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-[14px] font-medium text-[#B91C1C] hover:bg-[#FEF2F2] transition-colors"
+          >
+            <LogOut className="w-5 h-5" />
+            Sign out
           </button>
         </div>
       </div>
@@ -177,45 +254,118 @@ export function SideNav({ role }) {
 
 export function BottomNav({ role }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout } = useAuthStore();
+  const [moreOpen, setMoreOpen] = useState(false);
+  const [showLogout, setShowLogout] = useState(false);
+
   const tabs = role === "admin" ? adminBottomTabs : studentBottomTabs;
+  const allLinks = role === "admin" ? adminLinks : studentLinks;
+  const tabHrefs = new Set(tabs.map((t) => t.href));
+
+  const shouldFetchComplaints = role === "admin";
+  const { data: complaintsRes } = useComplaints(shouldFetchComplaints ? { status: "open" } : undefined);
+  const openComplaintCount = shouldFetchComplaints ? (complaintsRes?.data?.length ?? 0) : 0;
+
+  // "More" is active whenever the current route is not one of the visible tabs
+  const moreActive =
+    !moreOpen &&
+    !tabs.some((t) => pathname === t.href || pathname.startsWith(t.href + "/"));
+
+  const handleLogout = () => {
+    setShowLogout(false);
+    logout();
+    router.push("/login");
+  };
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-porcelain/[0.88] backdrop-blur-xl border-t border-ink/[0.06] safe-area-bottom">
-      <div className="flex items-start pt-2.5 pb-5">
-        {tabs.map((t) => {
-          const active = pathname === t.href || pathname.startsWith(t.href + "/");
-          const Icon = t.icon;
-          return (
-            <Link
-              key={t.href}
-              href={t.href}
-              className="flex-1 flex flex-col items-center gap-1"
-            >
-              <div
-                className={cn(
-                  "w-11 h-7 rounded-full flex items-center justify-center",
-                  active ? "bg-ink" : "bg-transparent"
-                )}
+    <>
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-porcelain/[0.88] backdrop-blur-xl border-t border-ink/[0.06] safe-area-bottom">
+        <div className="flex items-start pt-2.5 pb-5">
+          {tabs.map((t) => {
+            const active = pathname === t.href || pathname.startsWith(t.href + "/");
+            const Icon = t.icon;
+            return (
+              <Link
+                key={t.href}
+                href={t.href}
+                className="flex-1 flex flex-col items-center gap-1"
               >
-                <Icon
+                <div
                   className={cn(
-                    "w-4 h-4",
-                    active ? "text-porcelain" : "text-zinc-400"
+                    "w-11 h-7 rounded-full flex items-center justify-center",
+                    active ? "bg-ink" : "bg-transparent"
                   )}
-                />
-              </div>
-              <span
+                >
+                  <Icon
+                    className={cn(
+                      "w-4 h-4",
+                      active ? "text-porcelain" : "text-zinc-400"
+                    )}
+                  />
+                </div>
+                <span
+                  className={cn(
+                    "text-[10px]",
+                    active ? "font-semibold text-ink" : "font-medium text-faint"
+                  )}
+                >
+                  {t.label}
+                </span>
+              </Link>
+            );
+          })}
+
+          <button
+            onClick={() => setMoreOpen(true)}
+            className="flex-1 flex flex-col items-center gap-1 relative"
+            aria-label="More"
+          >
+            <div
+              className={cn(
+                "w-11 h-7 rounded-full flex items-center justify-center",
+                moreActive ? "bg-ink" : "bg-transparent"
+              )}
+            >
+              <MoreHorizontal
                 className={cn(
-                  "text-[10px]",
-                  active ? "font-semibold text-ink" : "font-medium text-faint"
+                  "w-4 h-4",
+                  moreActive ? "text-porcelain" : "text-zinc-400"
                 )}
-              >
-                {t.label}
+              />
+            </div>
+            <span
+              className={cn(
+                "text-[10px]",
+                moreActive ? "font-semibold text-ink" : "font-medium text-faint"
+              )}
+            >
+              More
+            </span>
+            {openComplaintCount > 0 && !tabHrefs.has("/admin/complaints") && (
+              <span className="absolute top-0 right-1/2 translate-x-[14px] min-w-[16px] h-4 px-1 rounded-full text-[9px] font-semibold flex items-center justify-center bg-red-500 text-white">
+                {openComplaintCount}
               </span>
-            </Link>
-          );
-        })}
-      </div>
-    </nav>
+            )}
+          </button>
+        </div>
+      </nav>
+
+      <MoreSheet
+        open={moreOpen}
+        onClose={() => setMoreOpen(false)}
+        links={allLinks}
+        openComplaintCount={openComplaintCount}
+        user={user}
+        role={role}
+        onLogout={() => setShowLogout(true)}
+      />
+
+      <LogoutConfirmModal
+        open={showLogout}
+        onClose={() => setShowLogout(false)}
+        onConfirm={handleLogout}
+      />
+    </>
   );
 }
