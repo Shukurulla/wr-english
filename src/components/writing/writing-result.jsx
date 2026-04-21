@@ -5,11 +5,20 @@ const criteriaLabels = {
   grammaticalRangeAccuracy: "Grammatical Range & Accuracy",
 };
 
+const BAND_LABELS_SEM1 = { 0.1: "Very Limited", 0.2: "Limited", 0.3: "Moderate", 0.4: "Good", 0.5: "Strong" };
+const BAND_LABELS_SEM2 = { 0.2: "Very Limited", 0.4: "Limited", 0.6: "Moderate", 0.8: "Good", 1.0: "Strong" };
+
+function getBandLabel(band, maxScore) {
+  const labels = maxScore <= 0.5 ? BAND_LABELS_SEM1 : BAND_LABELS_SEM2;
+  return labels[band] || "";
+}
+
 export function WritingResult({ submission }) {
   const ai = submission.writing?.aiEvaluation;
   if (!ai) return <p className="text-muted">AI baholash hali mavjud emas.</p>;
 
   const maxScore = submission.taskId?.maxScore || 0.5;
+  const bandLabel = getBandLabel(ai.band, maxScore);
 
   return (
     <div className="space-y-5">
@@ -22,6 +31,11 @@ export function WritingResult({ submission }) {
             {ai.band}
           </p>
           <p className="text-xs text-zinc-400 mt-1">/ {maxScore}</p>
+          {bandLabel && (
+            <span className="inline-block mt-3 px-3 py-1 rounded-full text-xs font-semibold bg-white/10 text-zinc-300">
+              {bandLabel}
+            </span>
+          )}
         </div>
       </div>
 
@@ -36,9 +50,16 @@ export function WritingResult({ submission }) {
             >
               <div className="flex items-end justify-between mb-1.5">
                 <span className="text-[13px] font-semibold">{criteriaLabels[key] || key}</span>
-                <span className="font-display text-[22px] font-normal tracking-tight">
-                  {c.band}
-                </span>
+                <div className="text-right">
+                  <span className="font-display text-[22px] font-normal tracking-tight">
+                    {c.band}
+                  </span>
+                  {getBandLabel(c.band, maxScore) && (
+                    <span className="block text-[10px] text-muted leading-none mb-0.5">
+                      {getBandLabel(c.band, maxScore)}
+                    </span>
+                  )}
+                </div>
               </div>
               <div className="h-[3px] bg-mist rounded-full overflow-hidden mb-1.5">
                 <div

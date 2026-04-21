@@ -58,10 +58,10 @@ export default function AdminTestsPage() {
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <div>
           <p className="section-label">Content</p>
-          <h1 className="text-2xl font-bold tracking-tight">Tests</h1>
+          <h1 className="text-2xl font-bold tracking-tight">Self-study tasks</h1>
         </div>
         <Button variant="primary" icon={Plus} onClick={() => setCreateOpen(true)}>
-          New Test
+          New Task
         </Button>
       </div>
 

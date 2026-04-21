@@ -24,7 +24,7 @@ import {
 
 const studentLinks = [
   { href: "/dashboard", label: "Home", icon: Home },
-  { href: "/tasks", label: "Tests", icon: FileText },
+  { href: "/tasks", label: "Self-study tasks", icon: FileText },
   { href: "/results", label: "Results", icon: BarChart3 },
   { href: "/grades", label: "Grades", icon: Award },
   { href: "/final-test", label: "Final Test", icon: ClipboardList },
@@ -37,7 +37,7 @@ const adminLinks = [
   { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/groups", label: "Groups", icon: Users },
   { href: "/admin/students", label: "Students", icon: GraduationCap },
-  { href: "/admin/tests", label: "Tests", icon: FileText },
+  { href: "/admin/tests", label: "Self-study tasks", icon: FileText },
   { href: "/admin/final-tests", label: "Final Tests", icon: ClipboardList },
   { href: "/admin/complaints", label: "Complaints", icon: MessageSquare, hasBadge: true },
 ];
@@ -45,7 +45,7 @@ const adminLinks = [
 // Bottom tabs: 3 primary links + "More" button
 const studentBottomTabs = [
   { href: "/dashboard", label: "Home", icon: Home },
-  { href: "/tasks", label: "Tests", icon: FileText },
+  { href: "/tasks", label: "Tasks", icon: FileText },
   { href: "/grades", label: "Grades", icon: Award },
 ];
 

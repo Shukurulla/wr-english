@@ -47,6 +47,9 @@ export default function GradesPage() {
   const readingScore = grades?.readingScore ?? 0;
   const writingScore = grades?.writingScore ?? 0;
   const finalTestScore = grades?.finalTestScore ?? 0;
+  const readingMax = grades?.readingMax ?? maxScore / 2;
+  const writingMax = grades?.writingMax ?? maxScore / 2;
+  const finalTestMax = grades?.finalTestMax ?? 2;
   const items = grades?.items ?? [];
   const passed = grades?.passed ?? false;
 
@@ -115,21 +118,21 @@ export default function GradesPage() {
           icon={BookOpen}
           label="Reading"
           score={readingScore}
-          max={maxScore / 2}
+          max={readingMax}
           color="bg-[#EFF6FF] text-[#1D4ED8]"
         />
         <BreakdownCard
           icon={PenLine}
           label="Writing"
           score={writingScore}
-          max={maxScore / 2}
+          max={writingMax}
           color="bg-[#ECFDF5] text-accent"
         />
         <BreakdownCard
           icon={ClipboardList}
           label="Final test"
           score={finalTestScore}
-          max={2}
+          max={finalTestMax}
           color="bg-[#FEF3C7] text-[#B45309]"
         />
       </div>
