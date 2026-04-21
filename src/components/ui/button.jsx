@@ -40,11 +40,13 @@ export function Button({
       disabled={loading || props.disabled}
       {...props}
     >
-      {loading ? (
-        <Loader2 className="w-4 h-4 animate-spin" />
-      ) : (
-        Icon && <Icon className="w-4 h-4" />
-      )}
+      <span className="inline-flex items-center justify-center">
+        {loading ? (
+          <Loader2 className="w-4 h-4 animate-spin" />
+        ) : (
+          Icon && <Icon className="w-4 h-4" />
+        )}
+      </span>
       {children}
     </button>
   );
