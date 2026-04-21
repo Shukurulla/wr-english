@@ -159,7 +159,7 @@ export default function GradesPage() {
 
               return (
                 <div
-                  key={item.assignmentId}
+                  key={item._id ?? item.assignmentId}
                   className="bg-white border border-line rounded-2xl p-4"
                 >
                   <div className="flex items-center gap-3">
