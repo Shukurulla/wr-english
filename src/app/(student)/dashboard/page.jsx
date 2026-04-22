@@ -50,10 +50,7 @@ export default function DashboardPage() {
     return (
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-ink">
-            Hello, {firstName}
-            <span className="ml-1" role="img" aria-label="wave">👋</span>
-          </h1>
+          <h1 className="text-2xl font-bold text-ink">{firstName}</h1>
           <Link
             href="/notifications"
             className="relative p-2.5 rounded-xl bg-white border border-line hover:bg-mist transition-colors"
@@ -108,7 +105,7 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      <div className="bg-ink rounded-[20px] p-6 text-porcelain">
+      <div className="bg-ink dark:bg-zinc-800 rounded-[20px] p-6 text-porcelain">
         <p className="text-[11px] font-semibold uppercase tracking-widest text-faint mb-1">
           Current semester
         </p>

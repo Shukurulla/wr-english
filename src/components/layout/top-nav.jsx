@@ -1,13 +1,36 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "next/navigation";
-import { LogOut } from "lucide-react";
+import { LogOut, Moon, Sun } from "lucide-react";
+
+function useDarkMode() {
+  const [dark, setDark] = useState(false);
+
+  useEffect(() => {
+    setDark(document.documentElement.classList.contains("dark"));
+  }, []);
+
+  const toggle = () => {
+    const next = !dark;
+    setDark(next);
+    if (next) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  };
+
+  return { dark, toggle };
+}
 
 export function TopNav() {
   const { user, logout } = useAuthStore();
   const router = useRouter();
   const [showConfirm, setShowConfirm] = useState(false);
+  const { dark, toggle } = useDarkMode();
 
   const handleLogout = () => {
     logout();
@@ -26,8 +49,16 @@ export function TopNav() {
         </div>
         <div className="hidden md:block" />
 
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-2.5">
+        <div className="flex items-center gap-1">
+          <button
+            onClick={toggle}
+            aria-label="Toggle dark mode"
+            className="p-2 rounded-lg hover:bg-mist text-muted hover:text-ink transition-colors"
+          >
+            {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+
+          <div className="hidden sm:flex items-center gap-2.5 ml-1">
             <div className="w-8 h-8 rounded-full bg-gradient-to-br from-zinc-300 to-zinc-400 flex items-center justify-center text-porcelain text-xs font-semibold">
               {user?.fullName?.charAt(0)?.toUpperCase() || "?"}
             </div>
@@ -43,12 +74,11 @@ export function TopNav() {
         </div>
       </header>
 
-      {/* Logout confirm modal */}
       {showConfirm && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-ink/60 backdrop-blur-sm" onClick={() => setShowConfirm(false)} />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
-            <div className="w-14 h-14 rounded-2xl bg-[#FEF2F2] flex items-center justify-center mx-auto mb-4">
+          <div className="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-[#FEF2F2] dark:bg-red-950 flex items-center justify-center mx-auto mb-4">
               <LogOut className="w-6 h-6 text-[#B91C1C]" />
             </div>
             <h3 className="text-lg font-bold text-ink mb-2">Sign Out</h3>

@@ -83,7 +83,7 @@ export default function GradesPage() {
         ))}
       </div>
 
-      <div className="bg-ink rounded-2xl p-6 text-porcelain">
+      <div className="bg-ink dark:bg-zinc-800 rounded-2xl p-6 text-porcelain">
         <div className="flex items-end justify-between mb-4">
           <div>
             <p className="text-[11px] font-semibold uppercase tracking-widest text-faint mb-1">

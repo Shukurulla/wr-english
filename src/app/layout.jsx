@@ -17,9 +17,21 @@ export const metadata = {
   description: "Reading & Writing self-study platform",
 };
 
+const themeScript = `
+  try {
+    const t = localStorage.getItem('theme');
+    if (t === 'dark' || (!t && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    }
+  } catch(e) {}
+`;
+
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="uz" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className={`${inter.className} ${fraunces.variable} antialiased`}>
         <QueryProvider>
           {children}

@@ -5,15 +5,15 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        ink: "#0A0A0B",
-        porcelain: "#FAFAF7",
-        mist: "#F4F4F0",
-        line: "#EAEAE4",
-        muted: "#71717A",
-        faint: "#A1A1AA",
+        ink: "rgb(var(--color-ink) / <alpha-value>)",
+        porcelain: "rgb(var(--color-porcelain) / <alpha-value>)",
+        mist: "rgb(var(--color-mist) / <alpha-value>)",
+        line: "rgb(var(--color-line) / <alpha-value>)",
+        muted: "rgb(var(--color-muted) / <alpha-value>)",
+        faint: "rgb(var(--color-faint) / <alpha-value>)",
         accent: {
-          DEFAULT: "#047857",
-          soft: "#ECFDF5",
+          DEFAULT: "rgb(var(--color-accent) / <alpha-value>)",
+          soft: "rgb(var(--color-accent-soft) / <alpha-value>)",
         },
       },
       fontFamily: {

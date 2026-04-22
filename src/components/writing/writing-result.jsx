@@ -23,7 +23,7 @@ export function WritingResult({ submission }) {
   return (
     <div className="space-y-5">
       {/* Score hero */}
-      <div className="bg-ink text-porcelain rounded-3xl p-8 text-center relative overflow-hidden">
+      <div className="bg-ink dark:bg-zinc-800 text-porcelain rounded-3xl p-8 text-center relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgba(4,120,87,0.35),transparent_60%)]" />
         <div className="relative">
           <p className="section-label text-zinc-500 mb-0">Umumiy ball</p>

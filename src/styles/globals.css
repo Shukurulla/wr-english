@@ -3,6 +3,28 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --color-ink: 10 10 11;
+    --color-porcelain: 250 250 247;
+    --color-mist: 244 244 240;
+    --color-line: 234 234 228;
+    --color-muted: 113 113 122;
+    --color-faint: 161 161 170;
+    --color-accent: 4 120 87;
+    --color-accent-soft: 236 253 245;
+  }
+
+  .dark {
+    --color-ink: 250 250 247;
+    --color-porcelain: 10 10 11;
+    --color-mist: 24 24 27;
+    --color-line: 39 39 42;
+    --color-muted: 161 161 170;
+    --color-faint: 82 82 91;
+    --color-accent: 5 150 105;
+    --color-accent-soft: 2 44 34;
+  }
+
   body {
     @apply bg-porcelain text-ink;
     letter-spacing: -0.01em;
@@ -95,12 +117,21 @@
   /* ---- Form inputs ---- */
   .input-base {
     @apply w-full px-3 py-2.5 border border-line rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-accent focus:border-transparent placeholder:text-faint disabled:bg-mist disabled:cursor-not-allowed;
+    @apply dark:bg-zinc-900 dark:text-ink dark:placeholder:text-faint dark:disabled:bg-zinc-800;
   }
   .select-base {
     @apply w-full px-3 py-2.5 border border-line rounded-xl text-sm bg-white focus:outline-none focus:ring-2 focus:ring-accent disabled:bg-mist disabled:cursor-not-allowed;
+    @apply dark:bg-zinc-900 dark:text-ink dark:disabled:bg-zinc-800;
   }
 
   /* No scrollbar utility */
   .scrollbar-none::-webkit-scrollbar { display: none; }
   .scrollbar-none { scrollbar-width: none; }
 }
+
+/* ---- Global dark mode overrides ---- */
+/* bg-white cards/panels → dark surface in dark mode */
+.dark .bg-white {
+  background-color: rgb(28 28 30);
+}
+/* border-white opacity variants on dark cards → no change needed */

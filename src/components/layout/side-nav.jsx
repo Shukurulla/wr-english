@@ -60,8 +60,8 @@ function LogoutConfirmModal({ open, onClose, onConfirm }) {
   return (
     <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-ink/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
-        <div className="w-14 h-14 rounded-2xl bg-[#FEF2F2] flex items-center justify-center mx-auto mb-4">
+      <div className="relative bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
+        <div className="w-14 h-14 rounded-2xl bg-[#FEF2F2] dark:bg-red-950 flex items-center justify-center mx-auto mb-4">
           <LogOut className="w-6 h-6 text-[#B91C1C]" />
         </div>
         <h3 className="text-lg font-bold text-ink mb-2">Sign Out</h3>
@@ -94,8 +94,8 @@ function MoreSheet({ open, onClose, links, openComplaintCount, user, role, onLog
   return (
     <div className="fixed inset-0 z-[150] md:hidden flex items-end" role="dialog" aria-modal="true">
       <div className="absolute inset-0 bg-ink/60 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-white rounded-t-3xl w-full max-h-[85vh] overflow-y-auto safe-area-bottom">
-        <div className="sticky top-0 bg-white z-10 flex items-center justify-between px-5 py-4 border-b border-line">
+      <div className="relative bg-white dark:bg-zinc-900 rounded-t-3xl w-full max-h-[85vh] overflow-y-auto safe-area-bottom">
+        <div className="sticky top-0 bg-white dark:bg-zinc-900 z-10 flex items-center justify-between px-5 py-4 border-b border-line">
           <h3 className="text-base font-bold text-ink">Menu</h3>
           <button
             onClick={onClose}
@@ -119,7 +119,7 @@ function MoreSheet({ open, onClose, links, openComplaintCount, user, role, onLog
                 className={cn(
                   "flex items-center justify-between px-3 py-3.5 rounded-xl text-[14px] font-medium transition-colors",
                   active
-                    ? "bg-ink text-porcelain"
+                    ? "bg-ink text-porcelain dark:bg-zinc-700"
                     : "text-ink hover:bg-mist"
                 )}
               >
@@ -181,7 +181,7 @@ export function SideNav({ role }) {
 
   return (
     <>
-      <nav className="w-60 shrink-0 border-r border-line bg-porcelain h-full py-6 px-4 hidden md:flex flex-col">
+      <nav className="w-60 shrink-0 border-r border-line bg-porcelain h-full py-6 px-4 hidden md:flex flex-col dark:bg-zinc-950">
         <div className="px-3 pb-5 flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg bg-ink flex items-center justify-center text-porcelain font-display text-sm font-semibold">
             R
@@ -201,8 +201,8 @@ export function SideNav({ role }) {
                 className={cn(
                   "flex items-center justify-between px-3 py-2.5 rounded-[10px] text-[13px] font-medium transition-colors",
                   active
-                    ? "bg-ink text-porcelain"
-                    : "text-zinc-600 hover:bg-mist"
+                    ? "bg-ink text-porcelain dark:bg-zinc-700"
+                    : "text-zinc-600 dark:text-zinc-300 hover:bg-mist"
                 )}
               >
                 <span className="flex items-center gap-2.5">
@@ -276,7 +276,7 @@ export function BottomNav({ role }) {
 
   return (
     <>
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-porcelain/[0.88] backdrop-blur-xl border-t border-ink/[0.06] safe-area-bottom">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-porcelain/[0.88] dark:bg-zinc-950/90 backdrop-blur-xl border-t border-ink/[0.06] safe-area-bottom">
         <div className="flex items-start pt-2.5 pb-5">
           {tabs.map((t) => {
             const active = pathname === t.href || pathname.startsWith(t.href + "/");
