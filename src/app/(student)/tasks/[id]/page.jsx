@@ -116,7 +116,7 @@ export default function TaskDetailPage() {
         <h1 className="text-xl font-bold text-ink tracking-tight">Test Details</h1>
       </div>
 
-      <div className="bg-ink rounded-2xl p-6 text-white relative overflow-hidden">
+      <div className="bg-ink dark:bg-zinc-800 rounded-2xl p-6 text-white relative overflow-hidden">
         <div className="absolute top-0 right-0 w-64 h-64 bg-[radial-gradient(circle_at_top_right,_rgba(4,120,87,0.2)_0%,_transparent_70%)]" />
 
         <div className="relative z-10 space-y-4">
